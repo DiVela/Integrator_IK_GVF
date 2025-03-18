@@ -1,25 +1,27 @@
 import numpy as np
+import math as mt
 
 def control_law(states, gvf, v, N, B, kb, kphi):
-
     #------------- Consnsus -------------
     L = B @ B.T
     theta = np.zeros((N,1))
     for i in range(N):
         theta[i] = np.atan2(states[i, 1], states[i, 0])
 
-    u = -(L @ theta)
-    u = (u + np.pi) % (2 * np.pi) - np.pi  
-    u = u * kb 
+    u = np.zeros((N,1))
     theta_dot = np.zeros((N, 1)) 
     r0 = gvf.radius
     for i in range(N):
-        if u[i] < - r0:
-            u[i] = -r0 * 0.9
-        elif u[i] > 2 * r0:
-            u[i] = r0 * 2
-
+        c2 = np.cos(theta[i])
+        s2 = np.sin(theta[i])
+        for j in range(N):
+            c1 = np.cos(theta[j])
+            s1 = np.sin(theta[j])
+            u[i] = u[i] + np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
+        u[i] = u[i] * kb
         theta_dot[i] = 1 / (r0 + u[i])
+
+
     u_dot =- kb * (L @ theta_dot)
     #------------- Behavior -------------
     gamma = u**2 + 2 * r0 * u
