@@ -1,26 +1,30 @@
 import numpy as np
-import math as mt
 
-def control_law(states, gvf, v, N, B, kb, kphi):
+from Controller.My_math.maths import build_B
+
+def control_law(states, gvf, v, N, Z, kb, kphi):
     #------------- Consnsus -------------
+    B = build_B(Z, N)
     L = B @ B.T
     theta = np.zeros((N,1))
     for i in range(N):
         theta[i] = np.atan2(states[i, 1], states[i, 0])
 
-    u = np.zeros((N,1))
+    e_theta = np.zeros((len(Z),1))
+    for i in range(len(Z)):
+        index1, index2 = Z[i]
+        c2 = np.cos(theta[index1])
+        s2 = np.sin(theta[index1])
+        c1 = np.cos(theta[index2])
+        s1 = np.sin(theta[index2])
+        e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
+
+    u = kb * (B @ e_theta)
+
     theta_dot = np.zeros((N, 1)) 
     r0 = gvf.radius
     for i in range(N):
-        c2 = np.cos(theta[i])
-        s2 = np.sin(theta[i])
-        for j in range(N):
-            c1 = np.cos(theta[j])
-            s1 = np.sin(theta[j])
-            u[i] = u[i] + np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
-        u[i] = u[i] * kb
         theta_dot[i] = 1 / (r0 + u[i])
-
 
     u_dot =- kb * (L @ theta_dot)
     #------------- Behavior -------------
