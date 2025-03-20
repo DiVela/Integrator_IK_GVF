@@ -4,6 +4,7 @@ from Controller.My_math.maths import build_B
 
 def control_law(states, gvf, v, N, Z, kb, kphi):
     #------------- Consnsus -------------
+    r0 = gvf.radius
     B = build_B(Z, N)
     L = B @ B.T
     theta = np.zeros((N,1))
@@ -18,17 +19,18 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
         c1 = np.cos(theta[index1])
         s1 = np.sin(theta[index1])
         e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
-
+    kb = kb/r0
     u = -kb * (B @ e_theta)
     theta_dot = np.zeros((N, 1)) 
-    r0 = gvf.radius
     
-    for i in range(len(u)):
-        if u[i] < -1/(r0):
-            u[i] = -1/(r0+0.1)
-        if u[i] > 1/(2*r0):
-            u[i] = 1/(2*r0+0.1)
-    
+
+    for i in range(N):
+        if u[i] <= -1/(r0 + 0.5 * r0):
+            u[i] = -1/(r0 + 0.5 * r0)
+        elif u[i] >= 1/(r0 + 1 * r0):
+            u[i] = 1/(r0 + 1 * r0)
+
+
     for i in range(N):
         theta_dot[i] = 1 / r0 + u[i]
 
@@ -38,11 +40,11 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
     a_dot = np.zeros((N,1))
     for i in range(N):
         a[i] =  -u[i] * r0**2 / (1 + u[i] * r0)
-        a_dot[i] = u[i] * r0**3 * u_dot[i] / (1 + u[i] * r0)**2 - u_dot[i] * r0**2 / (1 + u[i] * r0)
+        a_dot[i] = -r0**2 * u_dot[i] / (1 + u[i] * r0)**2
 
     #------------- Behavior -------------
     gamma = a**2 + 2 * r0 * a
-    gamma_dot = 2 * a_dot * (a + r0)
+    gamma_dot = 2 * a_dot * (a + r0) *0
     #-------------   GVF    -------------
     J = np.zeros((2, N))
     phi = np.zeros((N, 1))

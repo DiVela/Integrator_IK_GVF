@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
 
@@ -43,10 +42,10 @@ if __name__ == '__main__':
     N = 2
     s = np.array([0, 100, 100, 0])
     Z = [(0,1)]
-    system = integrator(s, 15, gvf, N, Z, 30, 0.9)
-
-    t_final = 100
-    sol = system.run_simulation(0.1, t_final)
+    system = integrator(s, 20, gvf, N, Z, 0.002, 0.95)
+    print(1/(0.002 /np.pi))
+    t_final = 200
+    sol = system.run_simulation(0.01, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
     x_cir, y_cir = gvf.gen_circumference_points(1000)
@@ -56,14 +55,17 @@ if __name__ == '__main__':
 
     states = sol
 
+    
     ax1.plot(states[0,:], states[1,:], color="green")
     ax1.plot(states[2,:], states[3,:], color="blue")
     #ax1.plot(states[4,:], states[5,:], color="red")
     #ax1.plot(states[6,:], states[7,:], color="brown")
     n = len(states[0,:])
     n=n-1
+    #for i in range(n):
     ax1.scatter(states[0,n], states[1,n], color="green", marker="x")
     ax1.scatter(states[2,n], states[3,n], color="blue", marker="x")
+        #plt.pause(0.001)
     #ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
     #ax1.scatter(states[6,n], states[7,n], color="brown", marker="x")
 
@@ -92,6 +94,7 @@ if __name__ == '__main__':
     #ax2.plot(t, E_theta[3, :])
     #print(e_theta[2,:])"
     plt.show()
+
 
     
 
