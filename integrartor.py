@@ -42,10 +42,10 @@ if __name__ == '__main__':
     N = 2
     s = np.array([0, 100, 100, 0])
     Z = [(0,1)]
-    system = integrator(s, 20, gvf, N, Z, 0.002, 0.95)
+    system = integrator(s, 20, gvf, N, Z, 1, 0.9)
     print(1/(0.002 /np.pi))
-    t_final = 200
-    sol = system.run_simulation(0.01, t_final)
+    t_final = 50
+    sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
     x_cir, y_cir = gvf.gen_circumference_points(1000)

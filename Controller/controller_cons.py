@@ -19,22 +19,23 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
         c1 = np.cos(theta[index1])
         s1 = np.sin(theta[index1])
         e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
-    kb = kb/r0
+    if N!=1:
+        kb = 1/(np.pi * (N)) * kb/r0
     u = -kb * (B @ e_theta)
     theta_dot = np.zeros((N, 1)) 
     
+    
+    for i in range(N):
+        if u[i] <= -v/(r0 + 0.1 * r0):
+            u[i] = -v/(r0 + 0.1 * r0)
+        elif u[i] >= 15/80 - v/(r0):
+            u[i] = 15/80 - v/(r0)
+    
 
     for i in range(N):
-        if u[i] <= -1/(r0 + 0.5 * r0):
-            u[i] = -1/(r0 + 0.5 * r0)
-        elif u[i] >= 1/(r0 + 1 * r0):
-            u[i] = 1/(r0 + 1 * r0)
+        theta_dot[i] = v / r0 + u[i]
 
-
-    for i in range(N):
-        theta_dot[i] = 1 / r0 + u[i]
-
-    u_dot =-(L @ u)
+    u_dot =-(L @ theta_dot)
 
     a = np.zeros((N,1))
     a_dot = np.zeros((N,1))
