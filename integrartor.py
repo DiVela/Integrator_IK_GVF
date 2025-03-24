@@ -38,13 +38,12 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_circumference([0,0], 80)
-    N = 2
-    s = np.array([0, 100, 100, 0])
-    Z = [(0,1)]
-    system = integrator(s, 20, gvf, N, Z, 1, 0.9)
-    print(1/(0.002 /np.pi))
-    t_final = 50
+    gvf = gvf_circumference([0,0], 83)
+    N = 3
+    s = np.array([0, 110, 110, 0, 110,110])*2
+    Z = [(0,1), (1,2)]
+    system = integrator(s, 15, gvf, N, Z, 1, 0.8)
+    t_final = 10
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
@@ -52,13 +51,11 @@ if __name__ == '__main__':
     ax1.plot(x_cir, y_cir, color="black")
     ax1.axis("equal")
 
-
     states = sol
-
     
     ax1.plot(states[0,:], states[1,:], color="green")
     ax1.plot(states[2,:], states[3,:], color="blue")
-    #ax1.plot(states[4,:], states[5,:], color="red")
+    ax1.plot(states[4,:], states[5,:], color="red")
     #ax1.plot(states[6,:], states[7,:], color="brown")
     n = len(states[0,:])
     n=n-1
@@ -66,7 +63,7 @@ if __name__ == '__main__':
     ax1.scatter(states[0,n], states[1,n], color="green", marker="x")
     ax1.scatter(states[2,n], states[3,n], color="blue", marker="x")
         #plt.pause(0.001)
-    #ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
+    ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
     #ax1.scatter(states[6,n], states[7,n], color="brown", marker="x")
 
     B = build_B(Z, N)
