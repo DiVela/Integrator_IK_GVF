@@ -11,7 +11,7 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
     theta = np.zeros((N,1))
     for i in range(N):
         theta[i] = np.atan2(states[i, 1], states[i, 0])
-
+    
     e_theta = np.zeros((len(Z),1))
     for i in range(len(Z)):
         index1, index2 = Z[i]
@@ -20,34 +20,35 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
         c1 = np.cos(theta[index1])
         s1 = np.sin(theta[index1])
         e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
-    if N!=1:
-        kb = 1/(np.pi * (N)) * 1/r0 
+
+    kb = 1/(np.pi * (N)) * 1/r0
     u = kb * (B @ e_theta) 
     theta_dot = np.zeros((N, 1)) 
-
-    rmax = 200
-
+    
     for i in range(N):
-        if u[i]<=-1/r0:
-            u[i] = -1/(r0 + 0.1)
-            print("aaa")
+        #if u[i]<=-1/r0:
+            #u[i] = -1/(r0 + 0.1)
+        if u[i]<=0:
+            u[i] = 0
         if u[i] >= 15/80/v - 1/r0:
             u[i] = 15/80/v - 1/r0
             print("ooo")
-
-
-
+    
     for i in range(N):
         theta_dot[i] = 1 / r0 + u[i]
+    e_theta_dot = np.zeros((len(Z),1))
 
-    u_dot = (L @ u)
+    for i in range(len(Z)):
+        index1, index2 = Z[i]
+        e_theta_dot[i] = theta_dot[index2] - theta_dot[index1]
+
+    u_dot = (B @ e_theta_dot)
 
     a = np.zeros((N,1))
     a_dot = np.zeros((N,1))
     for i in range(N):
         a[i] =  -u[i] * r0**2 * 1/ (1 + u[i] * r0)
         a_dot[i] = -r0**2 * u_dot[i] / (1 + u[i] * r0)**2
-    print((a+r0))
     #------------- Behavior -------------
     gamma = a**2 + 2 * r0 * a
     gamma_dot = 2 * a_dot * (a + r0) 
@@ -79,5 +80,5 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
             alpha = np.sqrt(v**2 - orn_norm**2)
             f[i,0] = alpha * vt_x + orn_x
             f[i,1] = alpha * vt_y + orn_y
-
+    print(f)
     return f

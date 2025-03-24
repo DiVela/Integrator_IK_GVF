@@ -38,12 +38,12 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_circumference([0,0], 83)
+    gvf = gvf_circumference([0,0], 200)
     N = 3
     s = np.array([0, 110, 110, 0, 110,110])*2
     Z = [(0,1), (1,2)]
-    system = integrator(s, 15, gvf, N, Z, 1, 0.8)
-    t_final = 10
+    system = integrator(s, 15, gvf, N, Z, 1, 1)
+    t_final = 100
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
@@ -85,9 +85,9 @@ if __name__ == '__main__':
 
     t = np.linspace(0, t_final, len(states[0,:]))
     E_theta = B @ e_theta
-    ax2.plot(t, E_theta[0, :])
-    ax2.plot(t, E_theta[1, :])
-    #ax2.plot(t, E_theta[2, :])
+    ax2.plot(t, E_theta[0, :], color="green")
+    ax2.plot(t, E_theta[1, :], color = "blue")
+    ax2.plot(t, E_theta[2, :], color="red")
     #ax2.plot(t, E_theta[3, :])
     #print(e_theta[2,:])"
     plt.show()
