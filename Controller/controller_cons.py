@@ -5,8 +5,7 @@ from Controller.My_math.maths import build_B
 def control_law(states, gvf, v, N, Z, kb, kphi):
     #------------- Consnsus -------------
     r0 = gvf.radius
-    B = -build_B(Z, N)
-    L = B @ B.T  
+    B = build_B(Z, N)
 
     theta = np.zeros((N,1))
     for i in range(N):
@@ -15,24 +14,21 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
     e_theta = np.zeros((len(Z),1))
     for i in range(len(Z)):
         index1, index2 = Z[i]
-        c2 = np.cos(theta[index2])
-        s2 = np.sin(theta[index2])
-        c1 = np.cos(theta[index1])
-        s1 = np.sin(theta[index1])
+        c2 = np.cos(theta[index1])
+        s2 = np.sin(theta[index1])
+        c1 = np.cos(theta[index2])
+        s1 = np.sin(theta[index2])
         e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
 
-    kb = 1/(np.pi * (N)) * 1/r0
+    kb = kb/(np.pi * (N)) * 1/r0 
     u = kb * (B @ e_theta) 
     theta_dot = np.zeros((N, 1)) 
     
     for i in range(N):
-        #if u[i]<=-1/r0:
-            #u[i] = -1/(r0 + 0.1)
-        if u[i]<=0:
-            u[i] = 0
+        if u[i]<=-1/r0:
+            u[i] = -1/(r0 + 0.1)
         if u[i] >= 15/80/v - 1/r0:
             u[i] = 15/80/v - 1/r0
-            print("ooo")
     
     for i in range(N):
         theta_dot[i] = 1 / r0 + u[i]
@@ -42,7 +38,7 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
         index1, index2 = Z[i]
         e_theta_dot[i] = theta_dot[index2] - theta_dot[index1]
 
-    u_dot = (B @ e_theta_dot)
+    u_dot = kb * (B @ e_theta_dot)
 
     a = np.zeros((N,1))
     a_dot = np.zeros((N,1))
@@ -80,5 +76,5 @@ def control_law(states, gvf, v, N, Z, kb, kphi):
             alpha = np.sqrt(v**2 - orn_norm**2)
             f[i,0] = alpha * vt_x + orn_x
             f[i,1] = alpha * vt_y + orn_y
-    print(f)
+
     return f

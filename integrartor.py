@@ -38,12 +38,12 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_circumference([0,0], 200)
+    gvf = gvf_circumference([0,0], 80)
     N = 3
-    s = np.array([0, 110, 110, 0, 110,110])*2
-    Z = [(0,1), (1,2)]
-    system = integrator(s, 15, gvf, N, Z, 1, 1)
-    t_final = 100
+    s = np.array([0, 110, 110, 0, 110,110])*4
+    Z = [(0,1), (0,2)]
+    system = integrator(s, 15, gvf, N, Z, 1, 0.9)
+    t_final = 300
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
