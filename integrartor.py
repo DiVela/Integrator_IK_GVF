@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 
 from Controller.My_math.maths import build_B
 from Controller.controller_cons import control_law 
+from Controller.controller_cons import control_law_elipse
 from GVF_trajectory.GVF_Circle import gvf_circumference
+from GVF_trajectory.GVF_Circle import gvf_elipse
 
 class integrator():
     def __init__(self, init_state, init_speed, gvf_traj, numUAV, graf, Kb, Kphi):
@@ -19,7 +21,7 @@ class integrator():
     def dynamics(self, state):
         states = state.reshape((self.N,2))
         states_dot = np.zeros((self.N,2))
-        states_dot = control_law(states, self.gvf, self.speed, self.N, self.B, self.kb, self.kphi)
+        states_dot = control_law_elipse(states, self.gvf, self.speed, self.N, self.B, self.kb, self.kphi, 10, 10)
         return states_dot.flatten()
     
     def run_simulation(self, dt, t_final):
@@ -38,19 +40,19 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_circumference([0,0], 80)
+    gvf = gvf_circumference([0,0], 100)
     N = 3
-    s = np.array([0, 110, 110, 0, 110,110])*4
-    Z = [(0,1), (0,2)]
-    system = integrator(s, 15, gvf, N, Z, 1, 0.9)
-    t_final = 300
+    s = np.array([0, 110, 110, 0, 110,110])*3
+    Z = [(0,1), (1,2)]
+    system = integrator(s, 15, gvf, N, Z, 1, 0.90)
+    t_final = 2000
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
     x_cir, y_cir = gvf.gen_circumference_points(1000)
     ax1.plot(x_cir, y_cir, color="black")
     ax1.axis("equal")
-
+    
     states = sol
     
     ax1.plot(states[0,:], states[1,:], color="green")
@@ -89,7 +91,8 @@ if __name__ == '__main__':
     ax2.plot(t, E_theta[1, :], color = "blue")
     ax2.plot(t, E_theta[2, :], color="red")
     #ax2.plot(t, E_theta[3, :])
-    #print(e_theta[2,:])"
+    #print(e_theta[2,:])
+    
     plt.show()
 
 
