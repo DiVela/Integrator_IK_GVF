@@ -98,7 +98,15 @@ def control_law_elipse(states, gvf, v, N, Z, kb, kphi, kx, ky):
 
     kb = kb / (np.pi * (N)) * max([gvf.a, gvf.b]) 
     u = kb * (B @ e_theta) 
-
+    
+    for i in range(N):
+        if u[i] <= 80 - min([gvf.a, gvf.b]):
+            u[i] = 80 - min([gvf.a, gvf.b])
+        elif (u[i] > 80 - min([gvf.a, gvf.b])) and (u[i] < 200 - max([gvf.a, gvf.b])):
+            u[i] = u[i]
+        elif u[i] >= 200 - max([gvf.a, gvf.b]):
+            u[i] = 200 - max([gvf.a, gvf.b])
+    
     theta_dot = np.zeros((N, 1)) 
     for i in range(N):
         theta_dot[i] = 1 / np.sqrt(gvf.a**2 * np.cos(theta[i])**2 + gvf.b**2 * np.sin(theta[i])**2)
@@ -119,10 +127,11 @@ def control_law_elipse(states, gvf, v, N, Z, kb, kphi, kx, ky):
     x_dot = np.zeros((N,1))
     y_dot = np.zeros((N,1))
     for i in range(N):
-        a[i] = (kx**2 * u[i]**2 + 2 * gvf.a * u[i]) / gvf.a**2 / (gvf.a + kx * u[i])**2
-        b[i] = (ky**2 * u[i]**2 + 2 * gvf.b * u[i]) / gvf.b**2 / (gvf.b + ky * u[i])**2
-        a_dot[i] = u_dot[i] * 2 * kx * (u[i] - 2 * gvf.a) / gvf.a**2 / (gvf.a + kx * u[i])**3
-        b_dot[i] = u_dot[i] * 2 * ky * (u[i] - 2 * gvf.b) / gvf.b**2 / (gvf.b + ky * u[i])**3
+        a[i] = (kx**2 * u[i]**2 + 2 * kx * gvf.a * u[i]) / gvf.a**2 / (gvf.a + kx * u[i])**2
+        b[i] = (ky**2 * u[i]**2 + 2 * ky * gvf.b * u[i]) / gvf.b**2 / (gvf.b + ky * u[i])**2
+        a_dot[i] = ((2 * u[i] * u_dot[i] * kx**2 + 2 * gvf.a * kx * u_dot[i]) * gvf.a**2 * (gvf.a + kx * u[i])**2 - (kx**2 * u[i]**2 + 2 * gvf.a * kx * u[i]) * 2 * gvf.a**2 * (gvf.a + kx * u[i]) * kx * u_dot[i]) / (gvf.a**4 * (gvf.a + kx * u[i])**4)
+        b_dot[i] = ((2 * u[i] * u_dot[i] * ky**2 + 2 * gvf.b * ky * u_dot[i]) * gvf.b**2 * (gvf.b + ky * u[i])**2 - (ky**2 * u[i]**2 + 2 * gvf.b * ky * u[i]) * 2 * gvf.b**2 * (gvf.b + ky * u[i]) * ky * u_dot[i]) / (gvf.b**4 * (gvf.b + ky * u[i])**4)
+
         x_dot[i] = v * np.cos(theta[i])
         y_dot[i] = v * np.sin(theta[i])
     #------------- Behavior -------------

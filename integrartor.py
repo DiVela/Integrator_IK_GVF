@@ -21,7 +21,14 @@ class integrator():
     def dynamics(self, state):
         states = state.reshape((self.N,2))
         states_dot = np.zeros((self.N,2))
-        states_dot = control_law_elipse(states, self.gvf, self.speed, self.N, self.B, self.kb, self.kphi, 10, 10)
+        states_dot = control_law_elipse(states,
+                                        self.gvf,
+                                        self.speed,
+                                        self.N, 
+                                        self.B, 
+                                        self.kb, 
+                                        self.kphi, 
+                                        0,1)
         return states_dot.flatten()
     
     def run_simulation(self, dt, t_final):
@@ -40,16 +47,16 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_circumference([0,0], 100)
-    N = 3
-    s = np.array([0, 110, 110, 0, 110,110])*3
-    Z = [(0,1), (1,2)]
+    gvf = gvf_elipse([0,0], 100, 80)
+    N = 2
+    s = np.array([0, 110, 110, 0])
+    Z = [(0,1)]
     system = integrator(s, 15, gvf, N, Z, 1, 0.90)
-    t_final = 2000
+    t_final = 500
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
-    x_cir, y_cir = gvf.gen_circumference_points(1000)
+    x_cir, y_cir = gvf.gen_elipse_points(1000)
     ax1.plot(x_cir, y_cir, color="black")
     ax1.axis("equal")
     
@@ -57,7 +64,7 @@ if __name__ == '__main__':
     
     ax1.plot(states[0,:], states[1,:], color="green")
     ax1.plot(states[2,:], states[3,:], color="blue")
-    ax1.plot(states[4,:], states[5,:], color="red")
+    #ax1.plot(states[4,:], states[5,:], color="red")
     #ax1.plot(states[6,:], states[7,:], color="brown")
     n = len(states[0,:])
     n=n-1
@@ -65,7 +72,7 @@ if __name__ == '__main__':
     ax1.scatter(states[0,n], states[1,n], color="green", marker="x")
     ax1.scatter(states[2,n], states[3,n], color="blue", marker="x")
         #plt.pause(0.001)
-    ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
+    #ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
     #ax1.scatter(states[6,n], states[7,n], color="brown", marker="x")
 
     B = build_B(Z, N)
@@ -89,7 +96,7 @@ if __name__ == '__main__':
     E_theta = B @ e_theta
     ax2.plot(t, E_theta[0, :], color="green")
     ax2.plot(t, E_theta[1, :], color = "blue")
-    ax2.plot(t, E_theta[2, :], color="red")
+    #ax2.plot(t, E_theta[2, :], color="red")
     #ax2.plot(t, E_theta[3, :])
     #print(e_theta[2,:])
     
