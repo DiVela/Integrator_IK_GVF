@@ -28,7 +28,7 @@ class integrator():
                                         self.B, 
                                         self.kb, 
                                         self.kphi, 
-                                        0,1)
+                                        1,1)
         return states_dot.flatten()
     
     def run_simulation(self, dt, t_final):
@@ -47,12 +47,12 @@ class integrator():
         ax.plot(states[2,:], states[3,:], color="blue", marker='.')
 
 if __name__ == '__main__':
-    gvf = gvf_elipse([0,0], 100, 80)
+    gvf = gvf_elipse([0,0], 100, 100)
     N = 2
     s = np.array([0, 110, 110, 0])
     Z = [(0,1)]
-    system = integrator(s, 15, gvf, N, Z, 1, 0.90)
-    t_final = 500
+    system = integrator(s, 15, gvf, N, Z, 20, 1)
+    t_final = 100
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
