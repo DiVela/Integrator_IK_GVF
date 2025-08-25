@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import det, inv
 
 from Controller.My_math.maths import build_B
 
@@ -21,11 +22,13 @@ def control_law(states, gvf, v, N, Z, kb, kphi, zd):
         s1 = np.sin(theta[index2])
         v1 = v[index1]
         v2 = v[index2]  
-        e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2) - zd[i] * np.pi/180
+        e_theta[i] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2) + zd[i] * np.pi/180
         e_speed[i] = v2 - v1
 
     kb = kb
-    u = kb * (B @ e_theta) + (B @ B.T @ B @ e_speed) * 1 / (r0)
+    L = B.T @ B
+    u = kb * (B @ (e_theta + inv(L) @ e_speed * 1/(kb * r0)))
+    #u = kb * (B @ e_theta) + (B @ e_speed) * 1 / (r0)
     theta_dot = np.zeros((N, 1)) 
     
     for i in range(N):

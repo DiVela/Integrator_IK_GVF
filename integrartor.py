@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.linalg import det, inv
 
 
 from Controller.My_math.maths import build_B
@@ -48,12 +49,12 @@ class integrator():
 
 if __name__ == '__main__':
     gvf = gvf_circumference([0,0], 100)
-    N = 3
-    s = np.array([0, 110, 110, 0, 0, -110])
-    Z = [(0,1), (1,2)]
-    zd = [10, -10]
-    system = integrator(s, [22, 20, 16], gvf, N, Z, 0.3, 1, zd)
-    t_final = 300
+    N = 5
+    s = np.array([0, 110, 0, 110, 0, 110, 0, 110, 110, 0])
+    Z = [(0,1), (1,2), (2,3), (4,0)]
+    zd = [5, -5, 5, 5]
+    system = integrator(s, [19, 19, 17, 17, 18], gvf, N, Z, 0.2, 1, zd)
+    t_final = 200
     sol = system.run_simulation(0.1, t_final)
 
     fig, (ax1,ax2) = plt.subplots(2,1)
@@ -66,7 +67,8 @@ if __name__ == '__main__':
     ax1.plot(states[0,:], states[1,:], alpha=0.3, color="green")
     ax1.plot(states[2,:], states[3,:], alpha=0.3, color="blue")
     ax1.plot(states[4,:], states[5,:], alpha=0.3, color="red")
-    #ax1.plot(states[6,:], states[7,:], color="brown")
+    ax1.plot(states[6,:], states[7,:], alpha=0.3, color="brown")
+    ax1.plot(states[8,:], states[9,:], alpha=0.3, color="black")
     n = len(states[0,:])
     n=n-1
     #for i in range(n):
@@ -74,7 +76,8 @@ if __name__ == '__main__':
     ax1.scatter(states[2,n], states[3,n], color="blue", marker="x")
         #plt.pause(0.001)
     ax1.scatter(states[4,n], states[5,n], color="red", marker="x")
-    #ax1.scatter(states[6,n], states[7,n], color="brown", marker="x")
+    ax1.scatter(states[6,n], states[7,n], color="brown", marker="x")
+    ax1.scatter(states[8,n], states[9,n], color="black", marker="x")
 
     B = build_B(Z, N)
     theta = np.zeros((N,len(states[0,:])))
@@ -90,7 +93,7 @@ if __name__ == '__main__':
         s2 = np.sin(theta[index1, :])
         c1 = np.cos(theta[index2, :])
         s1 = np.sin(theta[index2, :])
-        e_theta[i, :] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2)
+        e_theta[i, :] = np.atan2(s1 * c2 - c1 * s2, c1 * c2 + s1 * s2) + zd[i] * np.pi/180
     
 
     t = np.linspace(0, t_final, len(states[0,:]))
@@ -98,9 +101,10 @@ if __name__ == '__main__':
     ax2.plot(t, E_theta[0, :], color="green")
     ax2.plot(t, E_theta[1, :], color = "blue")
     ax2.plot(t, E_theta[2, :], color="red")
-    #ax2.plot(t, E_theta[3, :])
-    #print(e_theta[2,:])
-    
+    ax2.plot(t, E_theta[3, :], color="brown")
+
+    ax2.plot(t, E_theta[4, :], color="black")
+
     plt.show()
 
 
